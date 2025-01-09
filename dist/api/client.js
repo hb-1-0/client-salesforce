@@ -26,9 +26,13 @@ class SalesforceClient {
     authenticate() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!this.authToken) {
-                    this.authToken = yield (0, oauth_1.authenticate)(this.clientId, this.clientSecret, this.username, this.password);
-                }
+                const token = yield (0, oauth_1.authenticate)(this.clientId, this.clientSecret, this.username, this.password);
+                this.authToken = {
+                    access_token: token.access_token,
+                    instance_url: token.instance_url,
+                    expires_in: token.expires_in,
+                    created_at: Date.now(),
+                };
             }
             catch (error) {
                 throw new Error(`Authentication failed: ${error.message}`);
@@ -42,36 +46,10 @@ class SalesforceClient {
         return (currentTime >=
             this.authToken.created_at + this.authToken.expires_in * 1000);
     }
-    refreshAccessToken() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.authToken) {
-                throw new Error("No authentication token available.");
-            }
-            const url = `${this.authToken.instance_url}/services/oauth2/token`;
-            const params = new URLSearchParams({
-                grant_type: "refresh_token",
-                client_id: this.clientId,
-                client_secret: this.clientSecret,
-                refresh_token: this.authToken.refresh_token,
-            });
-            try {
-                const response = yield axios_1.default.post(url, params);
-                this.authToken.access_token = response.data.access_token;
-                this.authToken.expires_in = response.data.expires_in;
-                this.authToken.created_at = Date.now();
-            }
-            catch (error) {
-                throw new Error(`Failed to refresh access token: ${error.message}`);
-            }
-        });
-    }
     ensureToken() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.authToken || this.isTokenExpired()) {
                 yield this.authenticate();
-                if (this.authToken) {
-                    yield this.refreshAccessToken();
-                }
             }
         });
     }
@@ -80,7 +58,7 @@ class SalesforceClient {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.ensureToken();
-                const response = yield axios_1.default.get(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/vXX.X/query`, {
+                const response = yield axios_1.default.get(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/v62.0/query`, {
                     headers: {
                         Authorization: `Bearer ${(_b = this.authToken) === null || _b === void 0 ? void 0 : _b.access_token}`,
                     },

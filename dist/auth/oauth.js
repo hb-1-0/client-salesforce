@@ -13,30 +13,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authenticate = void 0;
-// src/auth/oauth.ts
 const axios_1 = __importDefault(require("axios"));
-function authenticate(clientId, clientSecret, username, password, loginUrl = "https://login.salesforce.com") {
+function authenticate(clientId, clientSecret, username, password) {
     return __awaiter(this, void 0, void 0, function* () {
-        const url = `${loginUrl}/services/oauth2/token`;
+        const url = "https://login.salesforce.com/services/oauth2/token";
         const params = new URLSearchParams({
             grant_type: "password",
             client_id: clientId,
             client_secret: clientSecret,
-            username,
-            password,
+            username: username,
+            password: password,
         });
         try {
             const response = yield axios_1.default.post(url, params);
+            const { access_token, instance_url, expires_in } = response.data;
             return {
-                access_token: response.data.access_token,
-                refresh_token: response.data.refresh_token,
-                instance_url: response.data.instance_url,
-                expires_in: response.data.expires_in,
-                created_at: Date.now(),
+                access_token,
+                instance_url,
+                expires_in,
             };
         }
         catch (error) {
-            throw new Error("Authentication failed");
+            throw new Error(`Authentication failed: ${error.message}`);
         }
     });
 }
