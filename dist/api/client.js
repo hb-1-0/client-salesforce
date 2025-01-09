@@ -76,8 +76,8 @@ class SalesforceClient {
         });
     }
     query(soql) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
             try {
                 yield this.ensureToken();
                 const response = yield axios_1.default.get(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/vXX.X/query`, {

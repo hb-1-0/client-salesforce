@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authenticate = authenticate;
+exports.authenticate = void 0;
 // src/auth/oauth.ts
 const axios_1 = __importDefault(require("axios"));
-function authenticate(clientId_1, clientSecret_1, username_1, password_1) {
-    return __awaiter(this, arguments, void 0, function* (clientId, clientSecret, username, password, loginUrl = "https://login.salesforce.com") {
+function authenticate(clientId, clientSecret, username, password, loginUrl = "https://login.salesforce.com") {
+    return __awaiter(this, void 0, void 0, function* () {
         const url = `${loginUrl}/services/oauth2/token`;
         const params = new URLSearchParams({
             grant_type: "password",
@@ -40,4 +40,5 @@ function authenticate(clientId_1, clientSecret_1, username_1, password_1) {
         }
     });
 }
+exports.authenticate = authenticate;
 //# sourceMappingURL=oauth.js.map
