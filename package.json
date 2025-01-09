@@ -1,0 +1,17 @@
+{
+  "name": "client-salesforce",
+  "version": "1.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "devDependencies": {
+    "typescript": "^4.0.0"
+  }
+}
