@@ -12,10 +12,12 @@ export class SalesforceClient {
   private authToken: AuthToken | null = null;
 
   constructor(
+    private username: string,
+    private password: string,
     private clientId: string,
     private clientSecret: string,
-    private username: string,
-    private password: string
+    private loginUrl: string,
+    private grant_type: string
   ) {}
 
   private async authenticate() {
@@ -24,7 +26,9 @@ export class SalesforceClient {
         this.clientId,
         this.clientSecret,
         this.username,
-        this.password
+        this.password,
+        this.loginUrl,
+        this.grant_type
       );
       this.authToken = {
         access_token: token.access_token,

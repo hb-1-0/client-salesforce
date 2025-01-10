@@ -14,11 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authenticate = void 0;
 const axios_1 = __importDefault(require("axios"));
-function authenticate(clientId, clientSecret, username, password) {
+function authenticate(clientId, clientSecret, username, password, loginUrl, grant_type) {
     return __awaiter(this, void 0, void 0, function* () {
-        const url = "https://login.salesforce.com/services/oauth2/token";
+        const url = loginUrl;
         const params = new URLSearchParams({
-            grant_type: "password",
+            grant_type: grant_type,
             client_id: clientId,
             client_secret: clientSecret,
             username: username,

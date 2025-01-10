@@ -16,17 +16,19 @@ exports.SalesforceClient = void 0;
 const axios_1 = __importDefault(require("axios"));
 const oauth_1 = require("../auth/oauth");
 class SalesforceClient {
-    constructor(clientId, clientSecret, username, password) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+    constructor(username, password, clientId, clientSecret, loginUrl, grant_type) {
         this.username = username;
         this.password = password;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.loginUrl = loginUrl;
+        this.grant_type = grant_type;
         this.authToken = null;
     }
     authenticate() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const token = yield (0, oauth_1.authenticate)(this.clientId, this.clientSecret, this.username, this.password);
+                const token = yield (0, oauth_1.authenticate)(this.clientId, this.clientSecret, this.username, this.password, this.loginUrl, this.grant_type);
                 this.authToken = {
                     access_token: token.access_token,
                     instance_url: token.instance_url,
