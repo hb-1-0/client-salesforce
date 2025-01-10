@@ -1,6 +1,6 @@
 {
   "name": "client-salesforce",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "commonjs",
@@ -25,6 +25,7 @@
     "salesforce-data",
     "salesforce-developer"
   ],
+  "license": "UNLICENSED",
   "scripts": {
     "build": "tsc"
   },
