@@ -1,9 +1,30 @@
 {
   "name": "client-salesforce",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "commonjs",
+  "keywords": [
+    "salesforce",
+    "salesforce-client",
+    "soql",
+    "salesforce-api",
+    "api-client",
+    "nodejs",
+    "typescript",
+    "salesforce-integration",
+    "crm",
+    "salesforce-sdk",
+    "force.com",
+    "oauth",
+    "salesforce-authentication",
+    "query",
+    "salesforce-query",
+    "lightweight",
+    "sdk",
+    "salesforce-data",
+    "salesforce-developer"
+  ],
   "scripts": {
     "build": "tsc"
   },
