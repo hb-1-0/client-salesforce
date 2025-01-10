@@ -1,6 +1,6 @@
 {
   "name": "client-salesforce",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "commonjs",
@@ -25,6 +25,10 @@
     "salesforce-data",
     "salesforce-developer"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hb-1-0/client-salesforce.git"
+  },
   "license": "UNLICENSED",
   "scripts": {
     "build": "tsc"
