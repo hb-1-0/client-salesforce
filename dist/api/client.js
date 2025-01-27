@@ -73,6 +73,59 @@ class SalesforceClient {
             }
         });
     }
+    create(objectType, data) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.ensureToken();
+                const response = yield axios_1.default.post(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/v62.0/sobjects/${objectType}`, data, {
+                    headers: {
+                        Authorization: `Bearer ${(_b = this.authToken) === null || _b === void 0 ? void 0 : _b.access_token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+                return response.data;
+            }
+            catch (error) {
+                throw new Error(`Create failed: ${error.message}`);
+            }
+        });
+    }
+    update(objectType, objectId, data) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.ensureToken();
+                const response = yield axios_1.default.patch(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/v62.0/sobjects/${objectType}/${objectId}`, data, {
+                    headers: {
+                        Authorization: `Bearer ${(_b = this.authToken) === null || _b === void 0 ? void 0 : _b.access_token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+                return response.status === 204; // Salesforce returns 204 for successful updates
+            }
+            catch (error) {
+                throw new Error(`Update failed: ${error.message}`);
+            }
+        });
+    }
+    delete(objectType, objectId) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.ensureToken();
+                const response = yield axios_1.default.delete(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/v62.0/sobjects/${objectType}/${objectId}`, {
+                    headers: {
+                        Authorization: `Bearer ${(_b = this.authToken) === null || _b === void 0 ? void 0 : _b.access_token}`,
+                    },
+                });
+                return response.status === 204; // Salesforce returns 204 for successful deletions
+            }
+            catch (error) {
+                throw new Error(`Delete failed: ${error.message}`);
+            }
+        });
+    }
 }
 exports.SalesforceClient = SalesforceClient;
 //# sourceMappingURL=client.js.map

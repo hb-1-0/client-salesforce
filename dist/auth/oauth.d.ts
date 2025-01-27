@@ -4,10 +4,10 @@ interface AuthResponse {
   expires_in: number;
 }
 export declare function authenticate(
-  username: string,
-  password: string,
   clientId: string,
   clientSecret: string,
+  username: string,
+  password: string,
   loginUrl: string,
   grant_type: string
 ): Promise<AuthResponse>;

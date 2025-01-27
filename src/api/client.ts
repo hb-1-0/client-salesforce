@@ -73,4 +73,63 @@ export class SalesforceClient {
       throw new Error(`Query failed: ${error.message}`);
     }
   }
+
+  public async create(objectType: string, data: Record<string, any>) {
+    try {
+      await this.ensureToken();
+      const response = await axios.post(
+        `${this.authToken?.instance_url}/services/data/v62.0/sobjects/${objectType}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${this.authToken?.access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(`Create failed: ${error.message}`);
+    }
+  }
+
+  public async update(
+    objectType: string,
+    objectId: string,
+    data: Record<string, any>
+  ) {
+    try {
+      await this.ensureToken();
+      const response = await axios.patch(
+        `${this.authToken?.instance_url}/services/data/v62.0/sobjects/${objectType}/${objectId}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${this.authToken?.access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.status === 204; // Salesforce returns 204 for successful updates
+    } catch (error) {
+      throw new Error(`Update failed: ${error.message}`);
+    }
+  }
+
+  public async delete(objectType: string, objectId: string) {
+    try {
+      await this.ensureToken();
+      const response = await axios.delete(
+        `${this.authToken?.instance_url}/services/data/v62.0/sobjects/${objectType}/${objectId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.authToken?.access_token}`,
+          },
+        }
+      );
+      return response.status === 204; // Salesforce returns 204 for successful deletions
+    } catch (error) {
+      throw new Error(`Delete failed: ${error.message}`);
+    }
+  }
 }

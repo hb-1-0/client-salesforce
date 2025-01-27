@@ -18,4 +18,11 @@ export declare class SalesforceClient {
   private isTokenExpired;
   private ensureToken;
   query(soql: string): Promise<any>;
+  create(objectType: string, data: Record<string, any>): Promise<any>;
+  update(
+    objectType: string,
+    objectId: string,
+    data: Record<string, any>
+  ): Promise<boolean>;
+  delete(objectType: string, objectId: string): Promise<boolean>;
 }
