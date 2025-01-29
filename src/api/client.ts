@@ -37,7 +37,15 @@ export class SalesforceClient {
         created_at: Date.now(),
       };
     } catch (error) {
-      throw new Error(`Authentication failed: ${error.message}`);
+      console.error(
+        "Authentication Error:",
+        error.response?.data || error.message
+      );
+      throw new Error(
+        `Authentication failed: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   }
 
@@ -56,6 +64,21 @@ export class SalesforceClient {
     }
   }
 
+  private handleAxiosError(error: any) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error("Error Response Data:", error.response.data);
+      throw new Error(
+        `Request failed with status ${error.response.status}: ` +
+          `${
+            error.response.data.message || JSON.stringify(error.response.data)
+          }`
+      );
+    } else {
+      console.error("Unexpected Error:", error);
+      throw new Error(`Unexpected error: ${error.message}`);
+    }
+  }
+
   public async query(soql: string) {
     try {
       await this.ensureToken();
@@ -70,7 +93,7 @@ export class SalesforceClient {
       );
       return response.data;
     } catch (error) {
-      throw new Error(`Query failed: ${error.message}`);
+      this.handleAxiosError(error);
     }
   }
 
@@ -89,7 +112,7 @@ export class SalesforceClient {
       );
       return response.data;
     } catch (error) {
-      throw new Error(`Create failed: ${error.message}`);
+      this.handleAxiosError(error);
     }
   }
 
@@ -110,9 +133,9 @@ export class SalesforceClient {
           },
         }
       );
-      return response.status === 204; // Salesforce returns 204 for successful updates
+      return response.status === 204;
     } catch (error) {
-      throw new Error(`Update failed: ${error.message}`);
+      this.handleAxiosError(error);
     }
   }
 
@@ -127,9 +150,9 @@ export class SalesforceClient {
           },
         }
       );
-      return response.status === 204; // Salesforce returns 204 for successful deletions
+      return response.status === 204;
     } catch (error) {
-      throw new Error(`Delete failed: ${error.message}`);
+      this.handleAxiosError(error);
     }
   }
 }

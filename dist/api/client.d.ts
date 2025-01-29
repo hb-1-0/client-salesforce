@@ -17,6 +17,7 @@ export declare class SalesforceClient {
   private authenticate;
   private isTokenExpired;
   private ensureToken;
+  private handleAxiosError;
   query(soql: string): Promise<any>;
   create(objectType: string, data: Record<string, any>): Promise<any>;
   update(
