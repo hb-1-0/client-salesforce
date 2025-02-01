@@ -29,7 +29,7 @@
     "type": "git",
     "url": "git+https://github.com/hb-1-0/client-salesforce.git"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "tsc"
   },
