@@ -36,16 +36,17 @@ export class SalesforceClient {
         expires_in: token.expires_in,
         created_at: Date.now(),
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(
         "Authentication Error:",
         error.response?.data || error.message
       );
-      throw new Error(
-        `Authentication failed: ${
+      throw {
+        message: `Authentication failed: ${
           error.response?.data?.message || error.message
-        }`
-      );
+        }`,
+        errorcode: error.response?.status || "AUTH_ERROR",
+      };
     }
   }
 
@@ -67,15 +68,16 @@ export class SalesforceClient {
   private handleAxiosError(error: any) {
     if (axios.isAxiosError(error) && error.response) {
       console.error("Error Response Data:", error.response.data);
-      throw new Error(
-        `Request failed with status ${error.response.status}: ` +
-          `${
-            error.response.data.message || JSON.stringify(error.response.data)
-          }`
-      );
+      throw {
+        message: error.response.data.message || "Request failed",
+        errorcode: error.response.status.toString(),
+      };
     } else {
       console.error("Unexpected Error:", error);
-      throw new Error(`Unexpected error: ${error.message}`);
+      throw {
+        message: error.message || "Unexpected error occurred",
+        errorcode: "UNEXPECTED_ERROR",
+      };
     }
   }
 
