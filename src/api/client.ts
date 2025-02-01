@@ -36,16 +36,15 @@ export class SalesforceClient {
         expires_in: token.expires_in,
         created_at: Date.now(),
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error(
         "Authentication Error:",
         error.response?.data || error.message
       );
       throw {
-        message: `Authentication failed: ${
-          error.response?.data?.message || error.message
-        }`,
-        errorcode: error.response?.status || "AUTH_ERROR",
+        message: error.response?.data[0]?.message || error.message,
+        errorcode:
+          error.response?.data[0]?.errorCode || "AUTHENTICATION_FAILED",
       };
     }
   }
@@ -67,16 +66,22 @@ export class SalesforceClient {
 
   private handleAxiosError(error: any) {
     if (axios.isAxiosError(error) && error.response) {
+      const errorData = error.response.data[0];
+      const message = errorData?.message || "An unexpected error occurred.";
+      const errorCode =
+        errorData?.errorCode || error.response.status.toString();
+
       console.error("Error Response Data:", error.response.data);
+
       throw {
-        message: error.response.data.message || "Request failed",
-        errorcode: error.response.status.toString(),
+        message,
+        errorcode: errorCode,
       };
     } else {
       console.error("Unexpected Error:", error);
       throw {
-        message: error.message || "Unexpected error occurred",
-        errorcode: "UNEXPECTED_ERROR",
+        message: error.message || "An unexpected error occurred.",
+        errorcode: "UNKNOWN_ERROR",
       };
     }
   }

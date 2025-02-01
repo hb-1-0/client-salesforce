@@ -26,7 +26,7 @@ class SalesforceClient {
         this.authToken = null;
     }
     authenticate() {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const token = yield (0, oauth_1.authenticate)(this.clientId, this.clientSecret, this.username, this.password, this.loginUrl, this.grant_type);
@@ -40,8 +40,8 @@ class SalesforceClient {
             catch (error) {
                 console.error("Authentication Error:", ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || error.message);
                 throw {
-                    message: `Authentication failed: ${((_c = (_b = error.response) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.message) || error.message}`,
-                    errorcode: ((_d = error.response) === null || _d === void 0 ? void 0 : _d.status) || "AUTH_ERROR",
+                    message: ((_c = (_b = error.response) === null || _b === void 0 ? void 0 : _b.data[0]) === null || _c === void 0 ? void 0 : _c.message) || error.message,
+                    errorcode: ((_e = (_d = error.response) === null || _d === void 0 ? void 0 : _d.data[0]) === null || _e === void 0 ? void 0 : _e.errorCode) || "AUTHENTICATION_FAILED",
                 };
             }
         });
@@ -62,17 +62,20 @@ class SalesforceClient {
     }
     handleAxiosError(error) {
         if (axios_1.default.isAxiosError(error) && error.response) {
+            const errorData = error.response.data[0];
+            const message = (errorData === null || errorData === void 0 ? void 0 : errorData.message) || "An unexpected error occurred.";
+            const errorCode = (errorData === null || errorData === void 0 ? void 0 : errorData.errorCode) || error.response.status.toString();
             console.error("Error Response Data:", error.response.data);
             throw {
-                message: error.response.data.message || "Request failed",
-                errorcode: error.response.status.toString(),
+                message,
+                errorcode: errorCode,
             };
         }
         else {
             console.error("Unexpected Error:", error);
             throw {
-                message: error.message || "Unexpected error occurred",
-                errorcode: "UNEXPECTED_ERROR",
+                message: error.message || "An unexpected error occurred.",
+                errorcode: "UNKNOWN_ERROR",
             };
         }
     }
