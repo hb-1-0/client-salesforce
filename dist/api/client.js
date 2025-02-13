@@ -26,22 +26,29 @@ class SalesforceClient {
         this.authToken = null;
     }
     authenticate() {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _e, _f, _g;
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                console.log("Authenticating...");
                 const token = yield (0, oauth_1.authenticate)(this.clientId, this.clientSecret, this.username, this.password, this.loginUrl, this.grant_type);
+                if (!(token === null || token === void 0 ? void 0 : token.access_token) || !(token === null || token === void 0 ? void 0 : token.instance_url)) {
+                    throw new Error("Invalid authentication response: Missing token data");
+                }
                 this.authToken = {
                     access_token: token.access_token,
                     instance_url: token.instance_url,
                     expires_in: token.expires_in,
                     created_at: Date.now(),
                 };
+                console.log("Authentication successful:", this.authToken);
             }
             catch (error) {
                 console.error("Authentication Error:", ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || error.message);
                 throw {
-                    message: ((_c = (_b = error.response) === null || _b === void 0 ? void 0 : _b.data[0]) === null || _c === void 0 ? void 0 : _c.message) || error.message,
-                    errorcode: ((_e = (_d = error.response) === null || _d === void 0 ? void 0 : _d.data[0]) === null || _e === void 0 ? void 0 : _e.errorCode) || "AUTHENTICATION_FAILED",
+                    message: ((_d = (_c = (_b = error.response) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.message) ||
+                        error.message ||
+                        "Authentication failed",
+                    errorcode: ((_g = (_f = (_e = error.response) === null || _e === void 0 ? void 0 : _e.data) === null || _f === void 0 ? void 0 : _f[0]) === null || _g === void 0 ? void 0 : _g.errorCode) || "AUTHENTICATION_FAILED",
                 };
             }
         });
@@ -56,38 +63,43 @@ class SalesforceClient {
     ensureToken() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.authToken || this.isTokenExpired()) {
+                console.log("Token expired or missing. Re-authenticating...");
                 yield this.authenticate();
             }
         });
     }
     handleAxiosError(error) {
+        console.error("API Error:", error);
         if (axios_1.default.isAxiosError(error) && error.response) {
-            const errorData = error.response.data[0];
-            const message = (errorData === null || errorData === void 0 ? void 0 : errorData.message) || "An unexpected error occurred.";
-            const errorCode = (errorData === null || errorData === void 0 ? void 0 : errorData.errorCode) || error.response.status.toString();
-            console.error("Error Response Data:", error.response.data);
+            const errorData = Array.isArray(error.response.data)
+                ? error.response.data[0]
+                : error.response.data;
             throw {
-                message,
-                errorcode: errorCode,
+                message: (errorData === null || errorData === void 0 ? void 0 : errorData.message) || "An unexpected error occurred.",
+                errorcode: (errorData === null || errorData === void 0 ? void 0 : errorData.errorCode) || error.response.status.toString(),
             };
         }
         else {
-            console.error("Unexpected Error:", error);
             throw {
                 message: error.message || "An unexpected error occurred.",
                 errorcode: "UNKNOWN_ERROR",
             };
         }
     }
+    getInstanceUrl() {
+        var _a;
+        if (!((_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url)) {
+            throw new Error("Instance URL is missing from authentication token.");
+        }
+        return this.authToken.instance_url;
+    }
     query(soql) {
-        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.ensureToken();
-                const response = yield axios_1.default.get(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/v62.0/query`, {
-                    headers: {
-                        Authorization: `Bearer ${(_b = this.authToken) === null || _b === void 0 ? void 0 : _b.access_token}`,
-                    },
+                const instanceUrl = this.getInstanceUrl();
+                const response = yield axios_1.default.get(`${instanceUrl}/services/data/v62.0/query`, {
+                    headers: { Authorization: `Bearer ${this.authToken.access_token}` },
                     params: { q: soql },
                 });
                 return response.data;
@@ -98,13 +110,13 @@ class SalesforceClient {
         });
     }
     create(objectType, data) {
-        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.ensureToken();
-                const response = yield axios_1.default.post(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/v62.0/sobjects/${objectType}`, data, {
+                const instanceUrl = this.getInstanceUrl();
+                const response = yield axios_1.default.post(`${instanceUrl}/services/data/v62.0/sobjects/${objectType}`, data, {
                     headers: {
-                        Authorization: `Bearer ${(_b = this.authToken) === null || _b === void 0 ? void 0 : _b.access_token}`,
+                        Authorization: `Bearer ${this.authToken.access_token}`,
                         "Content-Type": "application/json",
                     },
                 });
@@ -116,13 +128,13 @@ class SalesforceClient {
         });
     }
     update(objectType, objectId, data) {
-        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.ensureToken();
-                const response = yield axios_1.default.patch(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/v62.0/sobjects/${objectType}/${objectId}`, data, {
+                const instanceUrl = this.getInstanceUrl();
+                const response = yield axios_1.default.patch(`${instanceUrl}/services/data/v62.0/sobjects/${objectType}/${objectId}`, data, {
                     headers: {
-                        Authorization: `Bearer ${(_b = this.authToken) === null || _b === void 0 ? void 0 : _b.access_token}`,
+                        Authorization: `Bearer ${this.authToken.access_token}`,
                         "Content-Type": "application/json",
                     },
                 });
@@ -134,14 +146,12 @@ class SalesforceClient {
         });
     }
     delete(objectType, objectId) {
-        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.ensureToken();
-                const response = yield axios_1.default.delete(`${(_a = this.authToken) === null || _a === void 0 ? void 0 : _a.instance_url}/services/data/v62.0/sobjects/${objectType}/${objectId}`, {
-                    headers: {
-                        Authorization: `Bearer ${(_b = this.authToken) === null || _b === void 0 ? void 0 : _b.access_token}`,
-                    },
+                const instanceUrl = this.getInstanceUrl();
+                const response = yield axios_1.default.delete(`${instanceUrl}/services/data/v62.0/sobjects/${objectType}/${objectId}`, {
+                    headers: { Authorization: `Bearer ${this.authToken.access_token}` },
                 });
                 return response.status === 204;
             }
